@@ -1,5 +1,10 @@
 ORG 0x7C00
 
+mov ax, cs
+mov ds, ax
+
+begin_game:
+
 ;; Set video mode
 mov ah, 0
 mov al, 0x13
@@ -81,15 +86,44 @@ mov [es:di], byte 15
 mov ax, [ball_dx]
 ;; left wall
 cmp [ball_x], word 1
-jne .right_wall
+je player_2_point
+;; if (ball_x == 21 || ball_x == 19) && ball_y >= p1_pos && ball_y < p1_pos + 50
+cmp [ball_x], word 21
+je .check_vertical_bounds_p1
+cmp [ball_x], word 19
+je .check_vertical_bounds_p1
+jmp .check_paddle2
+.check_vertical_bounds_p1:
+mov bx, [ball_y]
+sub bx, [p1_pos]
+jl .check_paddle2
+cmp bx, 50
+jl .flip_x
+
+.check_paddle2:
+;; Check against right paddle
+;; if (ball_x == 299 || ball_x == 301) && ball_y >= p2_pos && ball_y < p2_pos + 50
+cmp [ball_x], word 299
+je .check_vertical_bounds_p2
+cmp [ball_x], word 301
+je .check_vertical_bounds_p2
+jmp .right_wall
+.check_vertical_bounds_p2:
+mov bx, [ball_y]
+sub bx, [p2_pos]
+jl .right_wall
+cmp bx, 50
+jge .right_wall
+
+.flip_x:
 imul ax, -1
 mov [ball_dx], ax
 jmp .top
 .right_wall:
 cmp [ball_x], word 318
-jne .top
-imul ax, -1
-mov [ball_dx], ax
+je player_1_point
+;imul ax, -1
+;mov [ball_dx], ax
 .top:
 ;; Check y bounds
 mov ax, [ball_dy]
@@ -134,7 +168,7 @@ add [p2_pos], word 1
 ;; Slow things down so we can see it
 mov cx, 0xffff
 .delay_loop:
-mov dx, 0x0040
+mov dx, 0x0010
 .delay_loop_inner:
 sub dx, 1
 jnz .delay_loop_inner
@@ -151,8 +185,59 @@ add [ball_x], bx
 mov bx, [ball_dy]
 add [ball_y], bx
 
-
 jmp main_loop
+
+player_1_message: db 'Player 1 scores!', 0
+player_2_message: db 'Player 2 scores!', 0
+
+player_1_point:
+mov si, player_1_message
+jmp draw_string
+
+player_2_point:
+mov si, player_2_message
+
+draw_string:
+xor ax, ax
+mov al, 3
+int 10h
+
+mov ax, 0xB800
+mov ax, es
+
+mov di, 12 * 80
+
+.string_loop:
+mov al, [si]
+mov ah, 15
+jz .exit_loop
+mov [es:di], ax
+add di, 2
+add si, 1
+jmp .string_loop
+.exit_loop:
+
+mov si, press_any_key
+mov di, 14 * 80
+
+.string_loop2:
+mov al, [si]
+jz .exit_loop2
+mov [es:di], al
+add di, 2
+add si, 1
+jmp .string_loop2
+.exit_loop2:
+
+;; wait for a keystroke
+mov ah, 0
+int 16h
+
+mov [ball_x], word 160
+mov [ball_y], word 100
+jmp begin_game
+
+press_any_key: db 'Press any key to continue', 0
 
 ball_x: dw 160
 ball_y: dw 100
