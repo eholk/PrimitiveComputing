@@ -14,8 +14,8 @@
 
 ORG 0x7C00
 
-mov ax, cs
-mov ds, ax
+xor ax, ax
+mov fs, ax
 
 begin_game:
 
@@ -180,14 +180,12 @@ add [p2_pos], word 1
 .no_key:
 
 ;; Slow things down so we can see it
-mov cx, 0xffff
+mov ax, [fs:0x046C]
 .delay_loop:
-mov dx, 0x0010
-.delay_loop_inner:
-sub dx, 1
-jnz .delay_loop_inner
-sub cx, 1
-jnz .delay_loop
+hlt
+mov bx, [fs:0x046C]
+test ax, bx
+je .delay_loop
 
 ;; erase ball
 mov [es:di], byte 0
