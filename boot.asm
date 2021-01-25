@@ -201,8 +201,8 @@ add [ball_y], bx
 
 jmp main_loop
 
-player_1_message: db 'Player 1 scores', 0
-player_2_message: db 'Player 2 scores', 0
+player_1_message: db 'Player 1 scores!', 0
+player_2_message: db 'Player 2 scores!', 0
 
 player_1_point:
 mov si, player_1_message
@@ -217,15 +217,15 @@ mov al, 3
 int 10h
 
 mov ax, 0xB800
-mov es, ax
+mov ax, es
 
 mov di, 12 * 80
 
 .string_loop:
 mov al, [si]
-test al, al
+mov ah, 15
 jz .exit_loop
-mov [es:di], al
+mov [es:di], ax
 add di, 2
 add si, 1
 jmp .string_loop
@@ -236,7 +236,6 @@ mov di, 14 * 80
 
 .string_loop2:
 mov al, [si]
-test al, al
 jz .exit_loop2
 mov [es:di], al
 add di, 2
