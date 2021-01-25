@@ -32,7 +32,7 @@ mov es, ax
 ;; Draw top line
 mov cx, 320
 mov di, 0
-mov al, 15
+mov al, 14
 rep stosb
 
 ;; Draw bottom line
@@ -43,7 +43,7 @@ rep stosb
 ;; Draw sides
 mov di, 319
 mov cx, 200
-mov ax, 0x0f0f
+mov ax, 0x0e0e
 .loop:
 mov [es:di], ax
 add di, 320
@@ -64,7 +64,7 @@ mov [es:di-320], byte 0
 ;; cx is size of paddle
 mov cx, 50
 .p1_loop:
-mov [es:di], byte 15
+mov [es:di], byte 10
 add di, 320
 sub cx, 1
 jnz .p1_loop
@@ -80,7 +80,7 @@ mov [es:di-320], byte 0
 ;; cx is size of paddle
 mov cx, 50
 .p2_loop:
-mov [es:di], byte 15
+mov [es:di], byte 10
 add di, 320
 sub cx, 1
 jnz .p2_loop
@@ -92,6 +92,7 @@ mov ax, [ball_y]
 imul ax, 320
 add ax, [ball_x]
 mov di, ax
+push di
 
 mov [es:di], byte 15
 
@@ -163,21 +164,26 @@ int 16h
 ;; al has ASCII code for keystroke
 cmp al, 'w'
 jne .test_s
-sub [p1_pos], word 1
+mov di, p1_pos
+call move_paddle_up
 .test_s:
 cmp al, 's'
 jne .test_i
-add [p1_pos], word 1
+mov di, p1_pos
+call move_paddle_down
 .test_i:
 cmp al, 'i'
 jne .test_k
-sub [p2_pos], word 1
+mov di, p2_pos
+call move_paddle_up
 .test_k:
 cmp al, 'k'
 jne .no_key
-add [p2_pos], word 1
+mov di, p2_pos
+call move_paddle_down
 
 .no_key:
+pop di
 
 ;; Slow things down so we can see it
 mov ax, [fs:0x046C]
@@ -251,11 +257,39 @@ jmp .begin
 .exit_loop:
 ret
 
+;; move_paddle_up:
+;;
+;; Inputs:
+;;   di - address of the paddle position
+move_paddle_up:
+push ax
+mov ax, [di]
+cmp ax, 1
+je .exit
+sub [di], word 1
+.exit:
+pop ax
+ret
+
+;; move_paddle_down:
+;;
+;; Inputs:
+;;   di - address of the paddle position
+move_paddle_down:
+push ax
+mov ax, [di]
+cmp ax, 199-50 ;; 199 is the bottom row, 50 is the paddle size
+je .exit
+add [di], word 1
+.exit:
+pop ax
+ret
+
 
 score_message: db 'Player '
 message_player_number: db 'X'
 db ' scores!', 0
-press_any_key: db 'Press any key to continue', 0
+press_any_key: db 'Press any key', 0
 
 ball_x: dw 160
 ball_y: dw 100
