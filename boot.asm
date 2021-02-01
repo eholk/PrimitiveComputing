@@ -1,18 +1,46 @@
-; Copyright 2021 Eric Holk
-;
-; Licensed under the Apache License, Version 2.0 (the "License"); you may not 
-; use this file except in compliance with the License. You may obtain a copy of
-; the License at
-;
-; http://www.apache.org/licenses/LICENSE-2.0
-;
-; Unless required by applicable law or agreed to in writing, software
-; distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
-; WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
-; License for the specific language governing permissions and limitations under
-; the License.
-
 ORG 0x7C00
+
+mov ah, 3h
+xor bx, bx
+int 10h
+;; now dh, dl has the cursor position
+
+mov ah, 13h
+mov al, 1
+mov bl, 7h
+mov cx, [hello_size]
+mov bp, hello
+int 10h
+
+mov ah, 2h
+mov al, 1
+xor ch, ch, ;; cylinder number
+mov cl, 2   ;; sector number
+xor dx, dx  ;; drive zero and head zero
+
+;; set up destination buffer
+mov bx, 0x0800
+mov es, bx
+xor bx, bx
+
+;; read sector
+int 13h
+
+;; TODO: check error
+
+;; jump into loaded code
+jmp 0x00008000
+
+loop: jmp loop
+
+hello: db 'Hello World', 13, 10
+hello_size: dw $ - hello
+
+SECTION .bootsignature start=0x7C00+510
+db 0x55, 0xAA
+
+
+SECTION .pong vstart=0x8000
 
 xor ax, ax
 mov fs, ax
@@ -298,6 +326,3 @@ ball_dy: dw 1
 
 p1_pos: dw 25
 p2_pos: dw 75
-
-SECTION .bootsignature start=0x7C00+510
-db 0x55, 0xAA
