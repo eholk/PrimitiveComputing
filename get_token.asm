@@ -44,6 +44,7 @@ jmp .exit
 
 .check_if:
 push ax
+sub bx, 1
 mov ax, bx
 push bx
 mov bx, .IF_TOKEN
@@ -51,6 +52,7 @@ call match_token
 pop bx
 cmp ax, bx
 je .check_num
+mov bx, ax
 mov ax, TOKEN_IF
 add sp, 2   ;; drop bx
 jmp .exit
@@ -59,6 +61,7 @@ jmp .exit
 .IF_TOKEN: dw .if_buffer, 2
 
 .check_num:
+add bx, 1
 pop ax ;; restore the saved ax from check_if
 cmp al, '0'
 jl .next

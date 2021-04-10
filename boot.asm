@@ -67,9 +67,9 @@ test_case3: db '+ 12 34'        ;; 46
 test_case3_len: equ $ - test_case3
 test_case4: db '* + 1 2 + 3 4 '  ;; 21
 test_case4_len: equ $ - test_case4
-test_case5: db 'if 0 1 2 '       ;; 1
+test_case5: db 'if 0 1 2 '       ;; 2
 test_case5_len: equ $ - test_case5
-test_case6: db 'if 3 1 2 '       ;; 2
+test_case6: db 'if 3 1 2 '       ;; 1
 test_case6_len: equ $ - test_case6
 
 ;; String representation (fat pointers)
@@ -87,8 +87,8 @@ dw test_case1, test_case1_len, 3
 dw test_case2, test_case2_len, 6
 dw test_case3, test_case3_len, 46
 dw test_case4, test_case4_len, 21
-dw test_case5, test_case5_len, 1
-dw test_case6, test_case6_len, 2
+dw test_case5, test_case5_len, 2
+dw test_case6, test_case6_len, 1
 dw 0 ;; end
 
 beginning:

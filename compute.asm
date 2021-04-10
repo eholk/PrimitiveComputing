@@ -12,8 +12,6 @@ call get_token
 
 cmp ax, TOKEN_IF
 jne .check_add
-.infinity:
-jmp .infinity
 call compute  ;; evaluate test
 mov bx, ax
 call compute  ;; evaluate consequent
