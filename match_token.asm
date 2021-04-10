@@ -25,20 +25,7 @@ mov di, ax
 test cx, cx
 jz .found
 
-xor dx, dx
 mov dl, [di]
-push ax
-mov ax, dx
-call print_number
-mov ax, STR_COLON
-call print_string
-xor ax, ax
-mov al, [si]
-call print_number
-mov ax, STR_PERIOD
-call print_string
-pop ax
-
 cmp [si], dl
 jne .not_found
 
