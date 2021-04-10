@@ -15,7 +15,7 @@ mov bp, hello
 int 10h
 
 mov ah, 2h
-mov al, 1
+mov al, 2   ;; number of sectors to read
 xor ch, ch, ;; cylinder number
 mov cl, 2   ;; sector number
 xor dx, dx  ;; drive zero and head zero
@@ -46,6 +46,7 @@ db 0x55, 0xAA
 ;; CONSTANTS:
 TOKEN_ADD equ -1
 TOKEN_MUL equ -2
+TOKEN_IF  equ -3
 
 ;; Main program
 SECTION .main vstart=0x8000
@@ -64,8 +65,12 @@ test_case2: db '* 2 3'          ;; 6
 test_case2_len: equ $ - test_case2
 test_case3: db '+ 12 34'        ;; 46
 test_case3_len: equ $ - test_case3
-test_case4: db '* + 1 2 + 3 4'  ;; 21
+test_case4: db '* + 1 2 + 3 4 '  ;; 21
 test_case4_len: equ $ - test_case4
+test_case5: db 'if 0 1 2 '       ;; 2
+test_case5_len: equ $ - test_case5
+test_case6: db 'if 3 1 2 '       ;; 1
+test_case6_len: equ $ - test_case6
 
 ;; String representation (fat pointers)
 ;;
@@ -82,6 +87,8 @@ dw test_case1, test_case1_len, 3
 dw test_case2, test_case2_len, 6
 dw test_case3, test_case3_len, 46
 dw test_case4, test_case4_len, 21
+dw test_case5, test_case5_len, 2
+dw test_case6, test_case6_len, 1
 dw 0 ;; end
 
 beginning:
@@ -140,3 +147,4 @@ jmp empty_loop
 %include "get_token.asm"
 %include "compute.asm"
 %include "print_string.asm"
+%include "match_token.asm"

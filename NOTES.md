@@ -2,6 +2,15 @@ This file has random notes that I write during the livestream. They generally
 have a rough outline of what I hoped to accomplish at the start of a session
 and some scribblings about the details. See the recording for more details.
 
+# March 28, 2021
+
+Goal: Add support for `if` expressions (again).
+
+Tasks:
+
+1. String compare (specialize for reading tokens)
+2. Add `if` evaluation.
+
 # March 7, 2021
 
 Goal: Add support for `if` expressions.

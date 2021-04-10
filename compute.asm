@@ -10,6 +10,26 @@ push dx
 
 call get_token
 
+cmp ax, TOKEN_IF
+jne .check_add
+call compute  ;; evaluate test
+mov bx, ax
+call compute  ;; evaluate consequent
+push ax
+call compute  ;; evaluate alternate
+
+test bx, bx
+jz .if_false
+
+;; if is true
+pop ax
+jmp .exit
+
+.if_false:
+add sp, 2
+jmp .exit
+
+.check_add:
 cmp ax, TOKEN_ADD
 jne .check_mul
 call compute
